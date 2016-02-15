@@ -17,7 +17,6 @@
 
 import os
 import sys
-from PIL import Image, ImageTk
 import numpy as np
 import cv2
 
@@ -33,10 +32,17 @@ VERSION = MAJOR + '.' + MINOR + '.' + PATCH
 #------------------
 #--  CONSTANTS ----
 
-DESTINATION_FOLDER = '.\\AIRFOILS'
+DESTINATION_FOLDER = './AIRFOILS'
 
 #------------------
 #----  METHODS ----
+
+def isfloat(value):
+    try:
+        float(value)
+        return True
+    except:
+        return False
 
 ## getFiles TCP client
 #
@@ -48,18 +54,26 @@ def getFiles(rootdir):
     Rslt = []
     for root, subFolders, files in os.walk(rootdir):
         for a in files:
-            Rslt.append(root + '\\' + a)
+            Rslt.append(root + '/' + a)
     return Rslt
 
 def getCoordsFromFile(filePath):
-    pass
-
-def getFileName(filePath):
-    pass
-
-def readFile(filePath):
+    dots = []
     with open(filePath) as f:
-        lines = f.read().splitlines()
+        for line in f.read().splitlines():
+            coords = line.split()
+            if len(coords)==2:
+                if (isfloat(coords[0]) and isfloat(coords[1])):
+                    x = int(float(coords[0])*1000)
+                    y = int(float(coords[1])*1000)+100
+                    dots.append((x,y))
+    return dots
+
+def getDestFilePath(filePath):
+    path, filename = os.path.split(filePath)
+    filename = filename.replace('.dat','.bmp')
+    filename = filename.replace('.cor','.bmp')
+    return DESTINATION_FOLDER + '/' + filename
 
 def filterList(fileList):
     Rslt = []
@@ -68,9 +82,8 @@ def filterList(fileList):
             Rslt.append(a)
     return Rslt
 
-def createImage():
-    return cv2.imread('.\\10ppm.bmp')
-
+def getBaseImage():
+    return cv2.imread('./10ppmm.bmp')
 
 def createDestinationFolder():
     if os.path.exists(DESTINATION_FOLDER):
@@ -86,15 +99,19 @@ def createDestinationFolder():
 # @details If the program is run directly or passed as an argument to the python
 #  interpreter then create a tiny Mintaka Server
 if __name__ == "__main__":
-    fileList = filterList(getFiles('.\\'))
+    fileList = filterList(getFiles('./'))
     if len(fileList):
         createDestinationFolder()
-        #for f in fileList:
-    img = createImage()
-    print img[100,100]
-    img.itemset((100,100,0),0)
-    cv2.imwrite('.\\kk.bmp',img)
-
+        for f in fileList:
+            if '.dat' in f or '.cor' in f:
+                img = getBaseImage()
+                #height, width, channels = img.shape
+                for dot in getCoordsFromFile(f):
+                    img[299,100]=[0,0,0]
+                    #img[dot[0],dot[1]]=[0,0,0]
+                dest = getDestFilePath(f)
+                print dest
+                cv2.imwrite(dest,img)
 
 #------------------
 #------------------
