@@ -2,15 +2,15 @@
 #-------------------
 #-------------------
 
-## @package MINTAKA
-#  @authors Celestica's Team
-#  @brief Module to communicate with Betelgeuse devices.
-#  @date 11/12/2014
-#  @version v1.0.1
+## @package AirFoils
+#  @authors TT
+#  @brief Parse airfoil files and create profiles images en a 1000x400 bmp file.
+#  @date 16/02/2016
+#  @version v0.1.0
 #
-#  @details This module contains a Betelgeuse TCP client and server classes
-#   to control the device remotely. On the other hand, this file can be run it
-#   directly like as a tiny betelgeuse server.
+#  @details This file constains the methods required for parsing airfoil files
+#  from working directory and for creating 1000x400 bmp files with the
+#  corresponding profile data
 
 #-------------------
 #-------------------
@@ -64,8 +64,8 @@ def getCoordsFromFile(filePath):
             coords = line.split()
             if len(coords)==2:
                 if (isfloat(coords[0]) and isfloat(coords[1])):
-                    x = int(float(coords[0])*1000)
-                    y = int(float(coords[1])*1000)+100
+                    x = int(float(coords[0])*999)
+                    y = int(float(coords[1])*999)+200
                     dots.append((x,y))
     return dots
 
@@ -83,7 +83,7 @@ def filterList(fileList):
     return Rslt
 
 def getBaseImage():
-    return cv2.imread('./10ppmm.bmp')
+    return cv2.imread('./10ppmm.bmp',cv2.IMREAD_GRAYSCALE)
 
 def createDestinationFolder():
     if os.path.exists(DESTINATION_FOLDER):
@@ -103,15 +103,15 @@ if __name__ == "__main__":
     if len(fileList):
         createDestinationFolder()
         for f in fileList:
-            if '.dat' in f or '.cor' in f:
-                img = getBaseImage()
-                #height, width, channels = img.shape
-                for dot in getCoordsFromFile(f):
-                    img[299,100]=[0,0,0]
-                    #img[dot[0],dot[1]]=[0,0,0]
-                dest = getDestFilePath(f)
-                print dest
-                cv2.imwrite(dest,img)
+            img = getBaseImage()
+            #height, width, channels = img.shape
+            dots = getCoordsFromFile(f)
+            for i in range(len(dots)-1):
+                cv2.line(img,dots[i], dots[i+1],(0,0,0),2)
+            dest = getDestFilePath(f)
+            cv2.imwrite(dest,img)
+            print dest
 
 #------------------
 #------------------
+
