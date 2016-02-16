@@ -19,6 +19,10 @@ import os
 import sys
 import numpy as np
 import cv2
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch, cm, mm
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 
 #------------------
 #----  VERSION ----
@@ -28,6 +32,11 @@ MINOR = '1'
 PATCH = '0'
 
 VERSION = MAJOR + '.' + MINOR + '.' + PATCH
+
+_DEBUG = 1
+
+_X = 400
+_Y = 1000
 
 #------------------
 #--  CONSTANTS ----
@@ -64,8 +73,8 @@ def getCoordsFromFile(filePath):
             coords = line.split()
             if len(coords)==2:
                 if (isfloat(coords[0]) and isfloat(coords[1])):
-                    x = int(float(coords[0])*999)
-                    y = int(float(coords[1])*999)+200
+                    y = int(float(coords[0])*999)
+                    x = int(float(coords[1])*999)+(_X/2)
                     dots.append((x,y))
     return dots
 
@@ -84,6 +93,13 @@ def filterList(fileList):
 
 def getBaseImage():
     return cv2.imread('./10ppmm.bmp',cv2.IMREAD_GRAYSCALE)
+
+def addAuxiliarLines(img):
+  cv2.line(img,(_X/2,0),(_X/2,_Y-1),(128,128,128),1)
+  slices = 20
+  fract = 1000/slices
+  for i in range(slices):
+    cv2.line(img,(0,fract * i),(_X-1,fract * i),(128,128,128),1)
 
 def createDestinationFolder():
     if os.path.exists(DESTINATION_FOLDER):
@@ -104,14 +120,22 @@ if __name__ == "__main__":
         createDestinationFolder()
         for f in fileList:
             img = getBaseImage()
+            addAuxiliarLines(img)
             #height, width, channels = img.shape
             dots = getCoordsFromFile(f)
             for i in range(len(dots)-1):
                 cv2.line(img,dots[i], dots[i+1],(0,0,0),2)
             dest = getDestFilePath(f)
             cv2.imwrite(dest,img)
+            destPDF = dest.replace('.bmp','.pdf')
+            c = canvas.Canvas(destPDF, pagesize=A4)
+            realSize = 150
+            c.drawImage(dest, _X/2, int((290-realSize)/2), int((realSize*_X*mm)/_Y) , realSize*mm)
+            c.showPage()
+            c.save()
             print dest
+            if _DEBUG == 1:
+                sys.exit()
 
 #------------------
 #------------------
-
