@@ -19,10 +19,8 @@ import os
 import sys
 import numpy as np
 import cv2
-from reportlab.pdfgen import canvas
-from reportlab.lib.units import inch, cm, mm
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
+import unittest
+from airfoilsUtils import *
 
 #------------------
 #----  VERSION ----
@@ -33,38 +31,18 @@ PATCH = '0'
 
 VERSION = MAJOR + '.' + MINOR + '.' + PATCH
 
-_DEBUG = 1
+#------------------
+#--  CONSTANTS ----
+
+_DEBUG = 0
 
 _X = 400
 _Y = 1000
-
-#------------------
-#--  CONSTANTS ----
 
 DESTINATION_FOLDER = './AIRFOILS'
 
 #------------------
 #----  METHODS ----
-
-def isfloat(value):
-    try:
-        float(value)
-        return True
-    except:
-        return False
-
-## getFiles TCP client
-#
-# @details This method returs all '.dat' and '.cor' files from the
-#  rootdir folder and subfolders
-#  @param rootdir folder to be analized.
-#  @return file's path list
-def getFiles(rootdir):
-    Rslt = []
-    for root, subFolders, files in os.walk(rootdir):
-        for a in files:
-            Rslt.append(root + '/' + a)
-    return Rslt
 
 def getCoordsFromFile(filePath):
     dots = []
@@ -84,19 +62,12 @@ def getDestFilePath(filePath):
     filename = filename.replace('.cor','.bmp')
     return DESTINATION_FOLDER + '/' + filename
 
-def filterList(fileList):
-    Rslt = []
-    for a in fileList:
-        if '.dat' in a or '.cor' in a:
-            Rslt.append(a)
-    return Rslt
-
 def getBaseImage():
     return cv2.imread('./10ppmm.bmp',cv2.IMREAD_GRAYSCALE)
 
 def addAuxiliarLines(img):
   cv2.line(img,(_X/2,0),(_X/2,_Y-1),(128,128,128),1)
-  slices = 20
+  slices = 40
   fract = 1000/slices
   for i in range(slices):
     cv2.line(img,(0,fract * i),(_X-1,fract * i),(128,128,128),1)
@@ -108,6 +79,62 @@ def createDestinationFolder():
         os.rmdir(DESTINATION_FOLDER)
     os.makedirs(DESTINATION_FOLDER)
 
+def convertDATA2BMP(strFilePath):
+    img = getBaseImage()
+    addAuxiliarLines(img)
+    dots = getCoordsFromFile(strFilePath)
+    for i in range(len(dots)-1):
+        cv2.line(img,dots[i], dots[i+1],(0,0,0),2)
+    docBMP = getDestFilePath(strFilePath)
+    cv2.imwrite(docBMP,img)
+    print docBMP
+    return docBMP
+
+def convertDATA2BMPs(strFolder):
+    fileList = filterList(getFiles(strFolder),'.dat') \
+     + filterList(getFiles(strFolder),'.cor')
+    count = 0
+    if len(fileList):
+        createDestinationFolder()
+        for f in fileList:
+            convertDATA2BMP(f)
+            count = count + 1
+            if _DEBUG == 1:
+                return
+    print ('Processed ' + str(count) + ' of ' + str(len(fileList)) + ' files')
+
+#-----------------------
+#------  UNITTES -------
+
+## Unittest purposes
+class CUnit_test(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        print ('Running CUnit_test ...')
+
+    @classmethod
+    def tearDownClass(cls):
+        print ('CUnit_test finish!')
+
+    #------------
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    #------------
+    #@unittest.skip("demonstrating skipping")
+    #@unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
+    @unittest.skipIf(True,"Skip it!")
+    def test_skip_it(self):
+        pass
+
+    def test_execute(self):
+        convertDATA2BMP('./')
+
 #------------------
 #------  MAIN -----
 
@@ -115,27 +142,7 @@ def createDestinationFolder():
 # @details If the program is run directly or passed as an argument to the python
 #  interpreter then create a tiny Mintaka Server
 if __name__ == "__main__":
-    fileList = filterList(getFiles('./'))
-    if len(fileList):
-        createDestinationFolder()
-        for f in fileList:
-            img = getBaseImage()
-            addAuxiliarLines(img)
-            #height, width, channels = img.shape
-            dots = getCoordsFromFile(f)
-            for i in range(len(dots)-1):
-                cv2.line(img,dots[i], dots[i+1],(0,0,0),2)
-            dest = getDestFilePath(f)
-            cv2.imwrite(dest,img)
-            destPDF = dest.replace('.bmp','.pdf')
-            c = canvas.Canvas(destPDF, pagesize=A4)
-            realSize = 150
-            c.drawImage(dest, _X/2, int((290-realSize)/2), int((realSize*_X*mm)/_Y) , realSize*mm)
-            c.showPage()
-            c.save()
-            print dest
-            if _DEBUG == 1:
-                sys.exit()
+    unittest.main()
 
 #------------------
 #------------------
