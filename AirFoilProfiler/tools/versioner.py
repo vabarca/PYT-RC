@@ -28,7 +28,7 @@ MAJOR = '0'
 MINOR = '1'
 PATCH = '1'
 VERSION = MAJOR + '.' + MINOR + '.' + PATCH
-PATH = '../'
+PATH = '../src'
 PATH_BACKUP = PATH + '/BACKUP'
 
 #------------------
