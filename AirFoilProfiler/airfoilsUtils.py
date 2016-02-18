@@ -5,8 +5,8 @@
 ## @package AirFoilsUtils
 #  @authors TT
 #  @brief Utils for the airfoil project
-#  @date 16/02/2016
-#  @version v0.1.0
+#  @date 18/02/2016
+#  @version v0.1.1
 #
 #  @details
 
@@ -20,9 +20,9 @@ import unittest
 #------------------
 #----  VERSION ----
 
-MAJOR = '0'
-MINOR = '1'
-PATCH = '0'
+MAJOR = str(0)
+MINOR = str(1)
+PATCH = str(1)
 
 VERSION = MAJOR + '.' + MINOR + '.' + PATCH
 

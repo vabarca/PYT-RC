@@ -5,8 +5,8 @@
 ## @package AirFoils
 #  @authors TT
 #  @brief Parse airfoil files and create profiles images en a 1000x400 bmp file.
-#  @date 16/02/2016
-#  @version v0.1.0
+#  @date 18/02/2016
+#  @version v0.1.1
 #
 #  @details This file constains the methods required for parsing airfoil files
 #  from working directory and for creating 1000x400 bmp files with the
@@ -29,9 +29,9 @@ from airfoilsBMP import *
 #------------------
 #----  VERSION ----
 
-MAJOR = '0'
-MINOR = '1'
-PATCH = '0'
+MAJOR = str(0)
+MINOR = str(1)
+PATCH = str(1)
 
 VERSION = MAJOR + '.' + MINOR + '.' + PATCH
 
