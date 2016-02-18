@@ -51,7 +51,7 @@ def convertBMP2PDF(strFilePath, realSize, strFolderDest = None):
     if strFolderDest:
         createFolder(strFolderDest,False)
         p, f = os.path.split(os.path.realpath(docPDF))
-        docPDF = strFolderDest + '/' + f
+        docPDF = os.path.normpath(strFolderDest + '/' + f)
     c = canvas.Canvas(docPDF, pagesize=A4)
     xSize = (realSize*imgSize[0]*mm)/imgSize[1]
     ySize = realSize*mm
@@ -109,7 +109,9 @@ class CUnit_test(unittest.TestCase):
         pass
 
     def test_execute(self):
-        convertBMP2PDFs('./',150,'./PDFs')
+        p, f = os.path.split(os.path.realpath(__file__))
+        p = os.path.normpath(p)
+        convertBMP2PDFs(p,150,os.path.normpath(p + '/PDFs'))
 
 #------------------
 #------  MAIN -----

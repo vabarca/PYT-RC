@@ -60,7 +60,9 @@ def getDestFileName(filePath):
     return filename.replace('.cor','.bmp')
 
 def getBaseImage():
-    return cv2.imread('./10ppmm.bmp',cv2.IMREAD_GRAYSCALE)
+    p, f = os.path.split(os.path.realpath(__file__))
+    p = os.path.normpath(p)
+    return cv2.imread(os.path.normpath(p + '/10ppmm.bmp'),cv2.IMREAD_GRAYSCALE)
 
 def addAuxiliarLines(img):
   cv2.line(img,(_X/2,0),(_X/2,_Y-1),(128,128,128),1)
@@ -81,7 +83,7 @@ def convertDATA2BMP(strFilePath, strFolderDest = None):
     if strFolderDest:
         createFolder(strFolderDest,False)
         p, f = os.path.split(os.path.realpath(docBMP))
-        docBMP = strFolderDest + '/' + f
+        docBMP = os.path.normpath(strFolderDest + '/' + f)
     cv2.imwrite(docBMP,img)
     print docBMP
     return docBMP
@@ -128,7 +130,9 @@ class CUnit_test(unittest.TestCase):
         pass
 
     def test_execute(self):
-        convertDATA2BMPs('./','./AIRFOILS')
+        p, f = os.path.split(os.path.realpath(__file__))
+        p = os.path.normpath(p)
+        convertDATA2BMPs(p,os.path.normpath(p + '/AIRFOILS'))
 
 #------------------
 #------  MAIN -----

@@ -47,7 +47,8 @@ gBMPFiles = []
 gSize = 20
 gIndex = 0
 gListBox = None
-gStrFolder = './'
+p, f = os.path.split(os.path.realpath(__file__))
+gStrFolder = os.path.normpath(p)
 
 #------------------
 #----  METHODS ----
@@ -61,8 +62,8 @@ def updateFileBox(strFolder):
 
     gListBox.delete(0, END)
     for f in gBMPFiles:
-        head, tail = os.path.split(f)
-        gListBox.insert(END, tail)
+        p, f = os.path.split(f)
+        gListBox.insert(END, f)
 
 def mainGUI(strFolder):
     global gSize
@@ -115,14 +116,14 @@ def createPDFCallBack():
         gSize = 290
     if gSize < 20:
         gsize = 20
-    convertBMP2PDF(gBMPFiles[gIndex],gSize,'./PDFs')
+    convertBMP2PDF(gBMPFiles[gIndex],gSize,os.path.normpath(gStrFolder + '/PDFs'))
     tkMessageBox.showinfo( "PDF file", "PDF generated!")
 
 def createBMPCallBack():
     global gListBox
     gListBox.delete(0,END)
-    createFolder('./AIRFOILS',True)
-    convertDATA2BMPs(gStrFolder,'./AIRFOILS')
+    createFolder(os.path.normpath(gStrFolder + '/AIRFOILS'),True)
+    convertDATA2BMPs(gStrFolder,os.path.normpath(gStrFolder + '/AIRFOILS'))
     updateFileBox(gStrFolder)
     tkMessageBox.showinfo( "BMP file", "BMPs generated!")
 
@@ -134,8 +135,6 @@ def onselectListBoxCallBack(evt):
     value = w.get(gIndex)
     img = cv2.imread(gBMPFiles[gIndex],cv2.IMREAD_GRAYSCALE)
     cv2.imshow('Profile', cv2.resize(img, (200, 500)) )
-    if _DEBUG:
-        print 'You selected item %d: "%s"' % (gIndex, value)
 
 #-----------------------
 #------  UNITTES -------
