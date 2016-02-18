@@ -39,8 +39,6 @@ _DEBUG = 0
 _X = 400
 _Y = 1000
 
-DESTINATION_FOLDER = './AIRFOILS'
-
 #------------------
 #----  METHODS ----
 
@@ -56,11 +54,10 @@ def getCoordsFromFile(filePath):
                     dots.append((x,y))
     return dots
 
-def getDestFilePath(filePath):
+def getDestFileName(filePath):
     path, filename = os.path.split(filePath)
     filename = filename.replace('.dat','.bmp')
-    filename = filename.replace('.cor','.bmp')
-    return DESTINATION_FOLDER + '/' + filename
+    return filename.replace('.cor','.bmp')
 
 def getBaseImage():
     return cv2.imread('./10ppmm.bmp',cv2.IMREAD_GRAYSCALE)
@@ -72,32 +69,30 @@ def addAuxiliarLines(img):
   for i in range(slices):
     cv2.line(img,(0,fract * i),(_X-1,fract * i),(128,128,128),1)
 
-def createDestinationFolder():
-    if os.path.exists(DESTINATION_FOLDER):
-        for a in getFiles(DESTINATION_FOLDER):
-            os.remove(a)
-        os.rmdir(DESTINATION_FOLDER)
-    os.makedirs(DESTINATION_FOLDER)
-
-def convertDATA2BMP(strFilePath):
+def convertDATA2BMP(strFilePath, strFolderDest = None):
+    if not os.path.isfile(strFilePath):
+        return
     img = getBaseImage()
     addAuxiliarLines(img)
     dots = getCoordsFromFile(strFilePath)
     for i in range(len(dots)-1):
         cv2.line(img,dots[i], dots[i+1],(0,0,0),2)
-    docBMP = getDestFilePath(strFilePath)
+    docBMP = getDestFileName(strFilePath)
+    if strFolderDest:
+        createFolder(strFolderDest,False)
+        p, f = os.path.split(os.path.realpath(docBMP))
+        docBMP = strFolderDest + '/' + f
     cv2.imwrite(docBMP,img)
     print docBMP
     return docBMP
 
-def convertDATA2BMPs(strFolder):
-    fileList = filterList(getFiles(strFolder),'.dat') \
-     + filterList(getFiles(strFolder),'.cor')
+def convertDATA2BMPs(strFolderOri ,strFolderDest = None):
+    fileList = filterList(getFiles(strFolderOri),'.dat') \
+     + filterList(getFiles(strFolderOri),'.cor')
     count = 0
     if len(fileList):
-        createDestinationFolder()
         for f in fileList:
-            convertDATA2BMP(f)
+            convertDATA2BMP(f, strFolderDest)
             count = count + 1
             if _DEBUG == 1:
                 return
@@ -133,7 +128,7 @@ class CUnit_test(unittest.TestCase):
         pass
 
     def test_execute(self):
-        convertDATA2BMP('./')
+        convertDATA2BMP('./','./AIRFOILS')
 
 #------------------
 #------  MAIN -----

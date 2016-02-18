@@ -44,11 +44,14 @@ _DEBUG = False
 #----  GLOBALS ----
 
 gBMPFiles = []
+gSize = 20
+gIndex = 0
 
 #------------------
 #----  METHODS ----
 
 def mainGUI(strFolder):
+    global gSize
     global gBMPFiles
     gBMPFiles = filterList(getFiles(strFolder),'.bmp')
 
@@ -77,13 +80,16 @@ def mainGUI(strFolder):
     var.set('Chord lenght (mm):')
     labelCtrl.pack()
 
-    spinBoxCtrl = Spinbox(top, from_=20, to=290, validate='all')
+    spinBoxCtrl = Spinbox(top, from_=20, to=290, textvariable = gSize)
     spinBoxCtrl.pack()
 
     #------
 
-    buttonCtrl = Button(top, text ="Generate PDF", command = createPDFCallBack)
-    buttonCtrl.pack()
+    buttonCtrlPDF = Button(top, text ="Generate PDF", command = createPDFCallBack)
+    buttonCtrlPDF.pack()
+
+    buttonCtrlBMP = Button(top, text ="Generate BMP", command = createBMPCallBack)
+    buttonCtrlBMP.pack()
 
     #------
 
@@ -93,19 +99,30 @@ def mainGUI(strFolder):
 #----  CALLBACK ----
 
 def createPDFCallBack():
-    tkMessageBox.showinfo( "Hello Python", "Hello World")
+    global gSize
+    if type(gSize) <> int:
+        gSize = 20
+    if gSize > 290:
+        gSize = 290
+    if gSize < 20
+        gsize = 20
+    convertBMP2PDF(gBMPFiles[gIndex],gSize,'./PDFs')
+    tkMessageBox.showinfo( "PDF file", "PDF generated!")
 
-def onChangeSpinBoxCallBack(s, S):
-    tkMessageBox.showinfo( "Hello Python", "Hello World")
+def createBMPCallBack():
+    createFolder('./AIRFOILS',True)
+    convertDATA2BMP('./','./AIRFOILS')
+
 
 def onselectListBoxCallBack(evt):
+    global gIndex
     w = evt.widget
-    index = int(w.curselection()[0])
-    value = w.get(index)
-    img = cv2.imread(gBMPFiles[index],cv2.IMREAD_GRAYSCALE)
+    gIndex = int(w.curselection()[0])
+    value = w.get(gIndex)
+    img = cv2.imread(gBMPFiles[gIndex],cv2.IMREAD_GRAYSCALE)
     cv2.imshow('Profile', cv2.resize(img, (200, 500)) )
     if _DEBUG:
-        print 'You selected item %d: "%s"' % (index, value)
+        print 'You selected item %d: "%s"' % (gIndex, value)
 
 #-----------------------
 #------  UNITTES -------

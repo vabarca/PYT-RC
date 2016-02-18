@@ -74,6 +74,19 @@ def filterList(strlist,pattern):
                     Rslt.append(a)
     return Rslt
 
+## Creates folder
+#
+# @details This method creates the given folder
+#  @param strFolder folder name
+#  @param bDelete indicates if delete content is required
+def createFolder(strFolder, bDelete = False):
+    if os.path.exists(DESTINATION_FOLDER):
+        if bDelete:
+            for a in getFiles(DESTINATION_FOLDER):
+                os.remove(a)
+    else:
+        os.makedirs(DESTINATION_FOLDER)
+
 #-----------------------
 #------  UNITTES -------
 

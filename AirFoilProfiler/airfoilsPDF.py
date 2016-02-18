@@ -42,10 +42,16 @@ _DEBUG = 0
 #------------------
 #----  METHODS ----
 
-def convertBMP2PDF(strFilePath, realSize):
+def convertBMP2PDF(strFilePath, realSize, strFolderDest = None):
+    if not os.path.isfile(strFilePath):
+        return
     img = cv2.imread(strFilePath,cv2.IMREAD_GRAYSCALE)
     imgSize = tuple(img.shape[1::-1])
     docPDF = strFilePath.replace('.bmp','.pdf')
+    if strFolderDest:
+        createFolder(strFolderDest,False)
+        p, f = os.path.split(os.path.realpath(docPDF))
+        docPDF = strFolderDest + '/' + f
     c = canvas.Canvas(docPDF, pagesize=A4)
     xSize = (realSize*imgSize[0]*mm)/imgSize[1]
     ySize = realSize*mm
@@ -62,12 +68,12 @@ def convertBMP2PDF(strFilePath, realSize):
         print yPos
     return docPDF
 
-def convertBMP2PDFs(strFolder, realSize):
-    fileList = filterList(getFiles(strFolder),'.bmp')
+def convertBMP2PDFs(strFolderOri, realSize, strFolderDest = None):
+    fileList = filterList(getFiles(strFolderOri),'.bmp')
     count = 0
     if len(fileList):
         for f in fileList:
-            convertBMP2PDF(f,realSize)
+            convertBMP2PDF(f,realSize, strFolderDest)
             count = count + 1
             if _DEBUG == 1:
                 return
@@ -103,7 +109,7 @@ class CUnit_test(unittest.TestCase):
         pass
 
     def test_execute(self):
-        convertBMP2PDFs('./',150)
+        convertBMP2PDFs('./',150,'/PDFs')
 
 #------------------
 #------  MAIN -----
