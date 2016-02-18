@@ -46,14 +46,27 @@ _DEBUG = False
 gBMPFiles = []
 gSize = 20
 gIndex = 0
+gListBox = None
+gStrFolder = './'
 
 #------------------
 #----  METHODS ----
 
+def updateFileBox(strFolder):
+    global gBMPFiles
+    global gListBox
+    global gStrFolder
+    gStrFolder = strFolder
+    gBMPFiles = filterList(getFiles(strFolder),'.bmp')
+
+    gListBox.delete(0, END)
+    for f in gBMPFiles:
+        head, tail = os.path.split(f)
+        gListBox.insert(END, tail)
+
 def mainGUI(strFolder):
     global gSize
-    global gBMPFiles
-    gBMPFiles = filterList(getFiles(strFolder),'.bmp')
+    global gListBox
 
     top = Tk()
 
@@ -62,16 +75,12 @@ def mainGUI(strFolder):
     scrollbar = Scrollbar(top)
     scrollbar.pack( side = RIGHT, fill=Y )
 
-    fileListBox = Listbox(top, yscrollcommand = scrollbar.set )
+    gListBox = Listbox(top, yscrollcommand = scrollbar.set )
+    updateFileBox(gStrFolder)
 
-    for f in gBMPFiles:
-        head, tail = os.path.split(f)
-        fileListBox.insert(END, tail)
-
-    fileListBox.pack( side = LEFT, fill = BOTH )
-    scrollbar.config( command = fileListBox.yview )
-
-    fileListBox.bind('<<ListboxSelect>>', onselectListBoxCallBack)
+    gListBox.pack( side = LEFT, fill = BOTH )
+    scrollbar.config( command = gListBox.yview )
+    gListBox.bind('<<ListboxSelect>>', onselectListBoxCallBack)
 
     #------
 
@@ -104,14 +113,18 @@ def createPDFCallBack():
         gSize = 20
     if gSize > 290:
         gSize = 290
-    if gSize < 20
+    if gSize < 20:
         gsize = 20
     convertBMP2PDF(gBMPFiles[gIndex],gSize,'./PDFs')
     tkMessageBox.showinfo( "PDF file", "PDF generated!")
 
 def createBMPCallBack():
+    global gListBox
+    gListBox.delete(0,END)
     createFolder('./AIRFOILS',True)
-    convertDATA2BMP('./','./AIRFOILS')
+    convertDATA2BMPs(gStrFolder,'./AIRFOILS')
+    updateFileBox(gStrFolder)
+    tkMessageBox.showinfo( "BMP file", "BMPs generated!")
 
 
 def onselectListBoxCallBack(evt):
@@ -154,7 +167,7 @@ class CUnit_test(unittest.TestCase):
         pass
 
     def test_execute(self):
-        mainGUI('./')
+        mainGUI(gStrFolder)
 
 #------------------
 #------  MAIN -----
