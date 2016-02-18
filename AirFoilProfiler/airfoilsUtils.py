@@ -80,12 +80,12 @@ def filterList(strlist,pattern):
 #  @param strFolder folder name
 #  @param bDelete indicates if delete content is required
 def createFolder(strFolder, bDelete = False):
-    if os.path.exists(DESTINATION_FOLDER):
+    if os.path.exists(strFolder):
         if bDelete:
-            for a in getFiles(DESTINATION_FOLDER):
+            for a in getFiles(strFolder):
                 os.remove(a)
     else:
-        os.makedirs(DESTINATION_FOLDER)
+        os.makedirs(strFolder)
 
 #-----------------------
 #------  UNITTES -------

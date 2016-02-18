@@ -109,7 +109,7 @@ class CUnit_test(unittest.TestCase):
         pass
 
     def test_execute(self):
-        convertBMP2PDFs('./',150,'/PDFs')
+        convertBMP2PDFs('./',150,'./PDFs')
 
 #------------------
 #------  MAIN -----

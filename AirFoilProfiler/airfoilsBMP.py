@@ -128,7 +128,7 @@ class CUnit_test(unittest.TestCase):
         pass
 
     def test_execute(self):
-        convertDATA2BMP('./','./AIRFOILS')
+        convertDATA2BMPs('./','./AIRFOILS')
 
 #------------------
 #------  MAIN -----
