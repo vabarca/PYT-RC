@@ -4,12 +4,12 @@
 
 ## @package AirFoils
 #  @authors TT
-#  @brief Parse airfoil files and create profiles images en a 1000x400 bmp file.
+#  @brief Parse airfoil files and create profiles images en a 1000x400 JPG file.
 #  @date 18/02/2016
 #  @version v0.1.1
 #
 #  @details This file constains the methods required for parsing airfoil files
-#  from working directory and for creating 1000x400 bmp files with the
+#  from working directory and for creating 1000x400 JPG files with the
 #  corresponding profile data
 
 #-------------------
@@ -71,7 +71,7 @@ def addAuxiliarLines(img):
   for i in range(slices):
     cv2.line(img,(0,fract * i),(_X-1,fract * i),(128,128,128),1)
 
-def convertDATA2BMP(strFilePath, strFolderDest = None):
+def convertDATA2IMAGE(strFilePath, strFolderDest = None):
     if not os.path.isfile(strFilePath):
         return
     img = getBaseImage()
@@ -79,22 +79,22 @@ def convertDATA2BMP(strFilePath, strFolderDest = None):
     dots = getCoordsFromFile(strFilePath)
     for i in range(len(dots)-1):
         cv2.line(img,dots[i], dots[i+1],(0,0,0),2)
-    docBMP = getDestFileName(strFilePath)
+    docIMAGE = getDestFileName(strFilePath)
     if strFolderDest:
         createFolder(strFolderDest,False)
-        p, f = os.path.split(os.path.realpath(docBMP))
-        docBMP = fixPathForWindows(strFolderDest + '/' + f)
-    cv2.imwrite(docBMP,img)
-    print (docBMP)
-    return docBMP
+        p, f = os.path.split(os.path.realpath(docIMAGE))
+        docIMAGE = fixPathForWindows(strFolderDest + '/' + f)
+    cv2.imwrite(docIMAGE,img)
+    print (docIMAGE)
+    return docIMAGE
 
-def convertDATA2BMPs(strFolderOri ,strFolderDest = None):
+def convertDATA2IMAGEs(strFolderOri ,strFolderDest = None):
     fileList = filterList(getFiles(strFolderOri),'.dat') \
      + filterList(getFiles(strFolderOri),'.cor')
     count = 0
     if len(fileList):
         for f in fileList:
-            convertDATA2BMP(f, strFolderDest)
+            convertDATA2IMAGE(f, strFolderDest)
             count = count + 1
             if _DEBUG == 1:
                 return
@@ -131,7 +131,7 @@ class CUnit_test(unittest.TestCase):
 
     def test_execute(self):
         p, f = os.path.split(os.path.realpath(__file__))
-        convertDATA2BMPs(p,fixPathForWindows(p + '/AIRFOILS'))
+        convertDATA2IMAGEs(p,fixPathForWindows(p + '/AIRFOILS'))
 
 #------------------
 #------  MAIN -----

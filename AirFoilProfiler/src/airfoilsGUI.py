@@ -4,12 +4,12 @@
 
 ## @package AirFoils
 #  @authors TT
-#  @brief Parse airfoil files and create profiles images en a 1000x400 bmp file.
+#  @brief Parse airfoil files and create profiles images en a 1000x400 jpg file.
 #  @date 18/02/2016
 #  @version v0.1.1
 #
 #  @details This file constains the methods required for parsing airfoil files
-#  from working directory and for creating 1000x400 bmp files with the
+#  from working directory and for creating 1000x400 jpg files with the
 #  corresponding profile data
 
 #-------------------
@@ -24,7 +24,7 @@ import tkMessageBox
 import unittest
 from airfoilsUtils import *
 from airfoilsPDF import *
-from airfoilsBMP import *
+from airfoilsIMAGE import *
 
 #------------------
 #----  VERSION ----
@@ -43,31 +43,33 @@ _DEBUG = False
 #------------------
 #----  GLOBALS ----
 
-gBMPFiles = []
+gIMAGEFiles = []
 gSize = 20
 gIndex = 0
 gListBox = None
 p, f = os.path.split(os.path.realpath(__file__))
-gStrFolder = os.path.normpath(p)
+gStrFolder = fixPathForWindows(p)
+gSpinBoxCtrl = None
 
 #------------------
 #----  METHODS ----
 
 def updateFileBox(strFolder):
-    global gBMPFiles
+    global gIMAGEFiles
     global gListBox
     global gStrFolder
     gStrFolder = strFolder
-    gBMPFiles = filterList(getFiles(strFolder),'.bmp')
+    gIMAGEFiles = filterList(getFiles(strFolder),'.jpg')
 
     gListBox.delete(0, END)
-    for f in gBMPFiles:
+    for f in gIMAGEFiles:
         p, f = os.path.split(f)
         gListBox.insert(END, f)
 
 def mainGUI(strFolder):
     global gSize
     global gListBox
+    global gSpinBoxCtrl
 
     top = Tk()
 
@@ -90,16 +92,16 @@ def mainGUI(strFolder):
     var.set('Chord lenght (mm):')
     labelCtrl.pack()
 
-    spinBoxCtrl = Spinbox(top, from_=20, to=290, textvariable = gSize)
-    spinBoxCtrl.pack()
+    gSpinBoxCtrl = Spinbox(top, from_=20, to=290, textvariable = gSize)
+    gSpinBoxCtrl.pack()
 
     #------
 
     buttonCtrlPDF = Button(top, text ="Generate PDF", command = createPDFCallBack)
     buttonCtrlPDF.pack()
 
-    buttonCtrlBMP = Button(top, text ="Generate BMP", command = createBMPCallBack)
-    buttonCtrlBMP.pack()
+    buttonCtrlIMAGE = Button(top, text ="Generate IMAGE", command = createJPGCallBack)
+    buttonCtrlIMAGE.pack()
 
     #------
 
@@ -110,30 +112,32 @@ def mainGUI(strFolder):
 
 def createPDFCallBack():
     global gSize
-    if type(gSize) <> int:
-        gSize = 20
+    gSize = int(gSpinBoxCtrl.get())
+    if type(gSize) == str:
+      gSize = int(gSize)
     if gSize > 290:
         gSize = 290
     if gSize < 20:
-        gsize = 20
-    convertBMP2PDF(gBMPFiles[gIndex],gSize,os.path.normpath(gStrFolder + '/PDFs'))
+        gSize = 20
+    print gSize
+    
+    convertIMAGE2PDF(gIMAGEFiles[gIndex],gSize,fixPathForWindows(gStrFolder + '/PDFs'))
     tkMessageBox.showinfo( "PDF file", "PDF generated!")
 
-def createBMPCallBack():
+def createJPGCallBack():
     global gListBox
     gListBox.delete(0,END)
-    createFolder(os.path.normpath(gStrFolder + '/AIRFOILS'),True)
-    convertDATA2BMPs(gStrFolder,os.path.normpath(gStrFolder + '/AIRFOILS'))
+    createFolder(fixPathForWindows(gStrFolder + '/AIRFOILS'),True)
+    convertDATA2IMAGEs(gStrFolder,fixPathForWindows(gStrFolder + '/AIRFOILS'))
     updateFileBox(gStrFolder)
-    tkMessageBox.showinfo( "BMP file", "BMPs generated!")
-
-
+    tkMessageBox.showinfo( "IMAGE file", "IMAGEs generated!")
+                                                                           
 def onselectListBoxCallBack(evt):
     global gIndex
     w = evt.widget
     gIndex = int(w.curselection()[0])
     value = w.get(gIndex)
-    img = cv2.imread(gBMPFiles[gIndex],cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread(gIMAGEFiles[gIndex],cv2.IMREAD_GRAYSCALE)
     cv2.imshow('Profile', cv2.resize(img, (200, 500)) )
 
 #-----------------------
