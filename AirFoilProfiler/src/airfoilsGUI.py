@@ -120,7 +120,7 @@ def createPDFCallBack():
     if gSize < 20:
         gSize = 20
     print gSize
-    
+
     convertIMAGE2PDF(gIMAGEFiles[gIndex],gSize,fixPathForWindows(gStrFolder + '/PDFs'))
     tkMessageBox.showinfo( "PDF file", "PDF generated!")
 
@@ -131,7 +131,7 @@ def createJPGCallBack():
     convertDATA2IMAGEs(gStrFolder,fixPathForWindows(gStrFolder + '/AIRFOILS'))
     updateFileBox(gStrFolder)
     tkMessageBox.showinfo( "IMAGE file", "IMAGEs generated!")
-                                                                           
+
 def onselectListBoxCallBack(evt):
     global gIndex
     w = evt.widget

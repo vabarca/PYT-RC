@@ -14,6 +14,7 @@
 #-------------------
 
 import os
+import glob
 import sys
 import unittest
 
@@ -55,8 +56,8 @@ def isfloat(value):
 def getFiles(rootdir):
     Rslt = []
     for root, subFolders, files in os.walk(rootdir):
-        for a in files:
-            Rslt.append(root + '/' + a)
+        for f in files:
+            Rslt.append(os.path.join(root, f))
     return Rslt
 
 ## Filters the given list
@@ -86,6 +87,14 @@ def createFolder(strFolder, bDelete = False):
                 os.remove(a)
     else:
         os.makedirs(strFolder)
+
+## Fixes path for windows purposes
+#
+# @details This method fixes the given paths for windows purposes
+#  @param strPath is the path to be fixed
+#  @return fixed path string
+def fixPathForWindows(strPath):
+    return os.path.normpath(strPath)
 
 #-----------------------
 #------  UNITTES -------
@@ -119,6 +128,10 @@ class CUnit_test(unittest.TestCase):
     def test_A(self):
         self.assertTrue(isfloat(1.18))
         self.assertFalse(isfloat(""))
+
+    def test_getFiles(self):
+        p, f = os.path.split(os.path.realpath(__file__))
+        print (len(getFiles(p)))
 
 #------------------
 #------  MAIN -----

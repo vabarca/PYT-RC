@@ -4,12 +4,12 @@
 
 ## @package AirFoilsPDF
 #  @authors TT
-#  @brief Print airfoil profiles from BMP (400x1000) to scaled PDF file
+#  @brief Print airfoil profiles from IMAGE (400x1000) to scaled PDF file
 #  @date 18/02/2016
 #  @version v0.1.1
 #
 #  @details This file constains the methods required for creating PDF airfoil files
-#  from BMP files in the working directory
+#  from IMAGE files in the working directory
 
 #-------------------
 #-------------------
@@ -42,12 +42,12 @@ _DEBUG = 0
 #------------------
 #----  METHODS ----
 
-def convertBMP2PDF(strFilePath, realSize, strFolderDest = None):
+def convertIMAGE2PDF(strFilePath, realSize, strFolderDest = None, strExtension = 'jpg'):
     if not os.path.isfile(strFilePath):
         return
     img = cv2.imread(strFilePath,cv2.IMREAD_GRAYSCALE)
     imgSize = tuple(img.shape[1::-1])
-    docPDF = strFilePath.replace('.bmp','.pdf')
+    docPDF = strFilePath.replace('.' + strExtension,'.pdf')
     if strFolderDest:
         createFolder(strFolderDest,False)
         p, f = os.path.split(os.path.realpath(docPDF))
@@ -68,12 +68,12 @@ def convertBMP2PDF(strFilePath, realSize, strFolderDest = None):
         print yPos
     return docPDF
 
-def convertBMP2PDFs(strFolderOri, realSize, strFolderDest = None):
-    fileList = filterList(getFiles(strFolderOri),'.bmp')
+def convertIMAGE2PDFs(strFolderOri, realSize, strFolderDest = None, strExtension = 'jpg'):
+    fileList = filterList(getFiles(strFolderOri), '.' + strExtension)
     count = 0
     if len(fileList):
         for f in fileList:
-            convertBMP2PDF(f,realSize, strFolderDest)
+            convertIMAGE2PDF(f,realSize, strFolderDest)
             count = count + 1
             if _DEBUG == 1:
                 return
@@ -111,7 +111,7 @@ class CUnit_test(unittest.TestCase):
     def test_execute(self):
         p, f = os.path.split(os.path.realpath(__file__))
         p = os.path.normpath(p)
-        convertBMP2PDFs(p,150,os.path.normpath(p + '/PDFs'))
+        convertIMAGE2PDFs(p,150,os.path.normpath(p + '/PDFs'))
 
 #------------------
 #------  MAIN -----
