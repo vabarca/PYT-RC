@@ -1,19 +1,14 @@
 
-#-------------------
-#-------------------
-
 ## @package AirFoils
 #  @authors TT
 #  @brief Parse airfoil files and create profiles images en a 1000x400 jpg file.
 #  @date 18/02/2016
 #  @version v0.1.1
 #
-#  @details This file constains the methods required for parsing airfoil files
+#  @details This file contains the methods required for parsing airfoil files
 #  from working directory and for creating 1000x400 jpg files with the
 #  corresponding profile data
 
-#-------------------
-#-------------------
 
 import os
 import sys
@@ -59,7 +54,7 @@ def updateFileBox(strFolder):
     global gListBox
     global gStrFolder
     gStrFolder = strFolder
-    gIMAGEFiles = filterList(getFiles(strFolder),'.jpg')
+    gIMAGEFiles = filterList(getFiles(strFolder), '.jpg')
 
     gListBox.delete(0, END)
     for f in gIMAGEFiles:
